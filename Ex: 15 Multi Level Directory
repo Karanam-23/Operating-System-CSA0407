@@ -1,0 +1,95 @@
+#include <stdio.h>
+#include <string.h>
+
+#define MAX_SUBDIR 10
+#define MAX_FILES 10
+#define FNAME 20
+#define SUBNAME 20
+
+typedef struct {
+    char files[MAX_FILES][FNAME];
+    int file_count;
+} SubDirectory;
+
+typedef struct {
+    char name[SUBNAME];
+    SubDirectory subdir;
+} Directory;
+
+Directory dir[MAX_SUBDIR];
+int sub_count = 0;
+
+int find_subdir(char name[]) {
+    for(int i=0;i<sub_count;i++)
+        if(strcmp(dir[i].name,name)==0) return i;
+    return -1;
+}
+
+void create_subdir() {
+    if(sub_count==MAX_SUBDIR){ printf("Maximum subdirectories reached!\n"); return; }
+    char name[SUBNAME];
+    printf("Enter subdirectory name: "); scanf("%s",name);
+    if(find_subdir(name)!=-1){ printf("Subdirectory already exists!\n"); return; }
+    strcpy(dir[sub_count].name,name);
+    dir[sub_count].subdir.file_count=0;
+    sub_count++;
+    printf("Subdirectory created.\n");
+}
+
+void create_file() {
+    char subname[SUBNAME], fname[FNAME];
+    printf("Enter subdirectory name: "); scanf("%s", subname);
+    int idx=find_subdir(subname);
+    if(idx==-1){ printf("Subdirectory not found!\n"); return; }
+    SubDirectory *sd = &dir[idx].subdir;
+    if(sd->file_count==MAX_FILES){ printf("Subdirectory full!\n"); return; }
+    printf("Enter filename to create: "); scanf("%s", fname);
+    for(int i=0;i<sd->file_count;i++)
+        if(strcmp(sd->files[i],fname)==0){ printf("File already exists!\n"); return; }
+    strcpy(sd->files[sd->file_count++], fname);
+    printf("File created successfully.\n");
+}
+
+void delete_file() {
+    char subname[SUBNAME], fname[FNAME];
+    printf("Enter subdirectory name: "); scanf("%s", subname);
+    int idx=find_subdir(subname);
+    if(idx==-1){ printf("Subdirectory not found!\n"); return; }
+    SubDirectory *sd = &dir[idx].subdir;
+    printf("Enter filename to delete: "); scanf("%s", fname);
+    for(int i=0;i<sd->file_count;i++){
+        if(strcmp(sd->files[i],fname)==0){
+            for(int j=i;j<sd->file_count-1;j++) strcpy(sd->files[j], sd->files[j+1]);
+            sd->file_count--;
+            printf("File deleted successfully.\n");
+            return;
+        }
+    }
+    printf("File not found!\n");
+}
+
+void display() {
+    if(sub_count==0){ printf("No subdirectories.\n"); return; }
+    for(int i=0;i<sub_count;i++){
+        printf("\nSubdirectory: %s\n", dir[i].name);
+        if(dir[i].subdir.file_count==0) printf("  No files.\n");
+        else for(int j=0;j<dir[i].subdir.file_count;j++)
+            printf("  %s\n", dir[i].subdir.files[j]);
+    }
+}
+
+int main() {
+    int choice;
+    while(1){
+        printf("\n1. Create Subdirectory\n2. Create File\n3. Delete File\n4. Display Directory\n5. Exit\nEnter choice: ");
+        scanf("%d",&choice);
+        switch(choice){
+            case 1: create_subdir(); break;
+            case 2: create_file(); break;
+            case 3: delete_file(); break;
+            case 4: display(); break;
+            case 5: return 0;
+            default: printf("Invalid choice!\n");
+        }
+    }
+}
