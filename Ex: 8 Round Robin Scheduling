@@ -1,0 +1,50 @@
+#include <stdio.h>
+
+int main() {
+    int n, tq;
+    printf("Enter number of processes: ");
+    scanf("%d", &n);
+
+    int at[n], bt[n], rt[n], ct[n], wt[n], tat[n];
+    for(int i=0;i<n;i++){
+        printf("Arrival and Burst for P%d: ", i+1);
+        scanf("%d %d", &at[i], &bt[i]);
+        rt[i]=bt[i];
+    }
+
+    printf("Enter Time Quantum: ");
+    scanf("%d", &tq);
+
+    int time=0, done=0;
+    while(done<n){
+        done=0;
+        for(int i=0;i<n;i++){
+            if(rt[i]>0 && at[i]<=time){
+                if(rt[i]>tq){
+                    rt[i]-=tq;
+                    time+=tq;
+                } else {
+                    time+=rt[i];
+                    rt[i]=0;
+                    ct[i]=time;
+                }
+            }
+            if(rt[i]==0) done++;
+        }
+        // If no process is ready, increment time
+        int ready=0;
+        for(int i=0;i<n;i++) if(rt[i]>0 && at[i]<=time) ready=1;
+        if(!ready) time++;
+    }
+
+    for(int i=0;i<n;i++){
+        tat[i]=ct[i]-at[i];
+        wt[i]=tat[i]-bt[i];
+    }
+
+    printf("\nP\tAT\tBT\tCT\tWT\tTAT\n");
+    for(int i=0;i<n;i++)
+        printf("P%d\t%d\t%d\t%d\t%d\t%d\n",i+1,at[i],bt[i],ct[i],wt[i],tat[i]);
+
+    return 0;
+}
