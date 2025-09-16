@@ -1,0 +1,57 @@
+#include <stdio.h>
+#include <string.h>
+
+#define MAX 100
+#define FNAME 20
+
+char directory[MAX][FNAME]; // array to store filenames
+int count = 0; // number of files
+
+void create() {
+    if(count == MAX){ printf("Directory full!\n"); return; }
+    char name[FNAME];
+    printf("Enter filename to create: ");
+    scanf("%s", name);
+    for(int i=0;i<count;i++){
+        if(strcmp(directory[i],name)==0){ printf("File already exists!\n"); return; }
+    }
+    strcpy(directory[count++], name);
+    printf("File created successfully.\n");
+}
+
+void delete() {
+    char name[FNAME];
+    printf("Enter filename to delete: ");
+    scanf("%s", name);
+    int i;
+    for(i=0;i<count;i++){
+        if(strcmp(directory[i],name)==0){
+            for(int j=i;j<count-1;j++) strcpy(directory[j], directory[j+1]);
+            count--;
+            printf("File deleted successfully.\n");
+            return;
+        }
+    }
+    printf("File not found!\n");
+}
+
+void display() {
+    if(count==0){ printf("Directory empty.\n"); return; }
+    printf("Files in directory:\n");
+    for(int i=0;i<count;i++) printf("%s\n", directory[i]);
+}
+
+int main() {
+    int choice;
+    while(1){
+        printf("\n1. Create File\n2. Delete File\n3. Display Files\n4. Exit\nEnter choice: ");
+        scanf("%d",&choice);
+        switch(choice){
+            case 1: create(); break;
+            case 2: delete(); break;
+            case 3: display(); break;
+            case 4: return 0;
+            default: printf("Invalid choice!\n");
+        }
+    }
+}
